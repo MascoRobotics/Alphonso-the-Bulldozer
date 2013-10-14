@@ -1,9 +1,9 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTServo,  none)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
-#pragma config(Motor,  mtr_S1_C1_1,     motorA,        tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C1_2,     motorB,        tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C2_1,     motorC,        tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C2_2,     motorD,        tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_1,     motor1,        tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_2,     motor2,        tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_1,     motor3,        tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_2,     motor4,        tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S1_C3_1,    servo1,               tServoStandard)
 #pragma config(Servo,  srvo_S1_C3_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S1_C3_3,    servo3,               tServoNone)
@@ -37,14 +37,15 @@ task main()
 {
 	initializeRobot();
 	while (true) {
-		int yval = joystick.joy1_y1;
+
+	  int yval = joystick.joy1_y1;
 		int xval = joystick.joy1_x1;
 
-		motor[motorA] = (-yval - xval) / speed;
-		motor[motorD] = (-yval - xval) / speed;
+		motor[motor1] = (-yval - xval) / speed;
+		motor[motor4] = (-yval - xval) / speed;
 
-		motor[motorB] = (yval - xval) / speed;
-		motor[motorC] = (yval - xval) / speed;
+		motor[motor2] = (yval - xval) / speed;
+		motor[motor3] = (yval - xval) / speed;
 
 		if (!pressed_d) {
 	  		if (joystick.joy1_TopHat == 0 || joystick.joy1_TopHat == 4) {
@@ -68,4 +69,5 @@ task main()
 			servo[servo1]=0;
 			servo[servo6]=0;
 		}
+	}
 }
