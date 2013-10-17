@@ -64,16 +64,18 @@ task main()
 		}
 		else									// if not pressed bulldozer is down
 		{
-			servo[servo1]=0;
-			servo[servo6]=0;
+			servo[servo1]=30;
+			servo[servo6]=30;
 		}
 		if(joy1Btn(1)==1) // if button 1 is pressed
 		{
 		  motor[flag]=100; // flag raiser motor will activate
 		}
-		else									// if not pressed
+		else if (joy1Btn(3))									// if not pressed
 		{
-			motor[flag]=0;   // flag motor will not activate
+			motor[flag]=-100;   // flag motor will not activate
+		} else {
+		  motor[flag]=0;
 		}
 	}
 }
