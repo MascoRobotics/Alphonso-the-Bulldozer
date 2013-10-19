@@ -28,6 +28,34 @@ void initializeRobot()
 	return;
 }
 
+void move(int xval, int yval) {
+
+		motor[motorA] = (-yval - xval) / speed;
+		motor[motorD] = (-yval - xval) / speed;
+
+		motor[motorB] = (yval - xval) / speed;
+		motor[motorC] = (yval - xval) / speed;
+}
+
+void liftUp() {
+	servo[servo1]=255; // bulldozer lifts up
+	servo[servo6]=255;
+}
+
+void closeLift() {
+	servo[servo1]=0; // bulldozer lifts up
+	servo[servo6]=0;
+}
+
+void collectBlock() {
+	liftUp();
+	move(0, 255);
+	wait1MSec(300);
+	move(0, 0);
+	closeLift();
+}
+
+
 void addSpeed(int add)
 {
 	speed += add;
@@ -40,11 +68,7 @@ task main()
 		int yval = joystick.joy1_y1;
 		int xval = joystick.joy1_x1;
 
-		motor[motorA] = (-yval - xval) / speed;
-		motor[motorD] = (-yval - xval) / speed;
-
-		motor[motorB] = (yval - xval) / speed;
-		motor[motorC] = (yval - xval) / speed;
+		move(xval, yval);
 
 		if (!pressed_d) {
 	  		if (joystick.joy1_TopHat == 0 || joystick.joy1_TopHat == 4) {
@@ -68,4 +92,9 @@ task main()
 			servo[servo1]=0;
 			servo[servo6]=0;
 		}
+
+		if (joy1Btn(2)) {
+			collectBlock();
+		}
+	}
 }
