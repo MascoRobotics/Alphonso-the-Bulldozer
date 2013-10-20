@@ -17,57 +17,17 @@ VARS
 int startingValue = 0;
 int v = 0;
 int tapeValue = 0;
-int encoderValue = 0;
+
 
 /*
 FUNCTION DECLARATION
 */
 bool doISeeTape();
 void findTape();
-bool amIonTape();
-void driveAlongTape();
-void alignToTape();
-void moveFoward();
-void moveRotate(int value);
-void stopMoving();
-void faceTape();
 
 /*
 FUNCTIONS
 */
-void faceTape() {
-	moveFoward();
-	wait1Msec(500);
-	moveRotate(1);
-	nMotorEncoder[motor4] = 0;
-
-	while (encoderValue < 400) {
-		encoderValue = nMotorEncoder[motor4];
-	}
-	stopMoving();
-}
-
-void moveFoward() {
-	motor[motor1] = -50;
-	motor[motor4] = -50;
-	motor[motor2] = 50;
-	motor[motor3] = 50;
-}
-
-void moveRotate(int value) {
-	motor[motor1] = 50 * value;
-	motor[motor4] = 50 * value;
-	motor[motor2] = 50 * value;
-	motor[motor3] = 50 * value;
-}
-
-void stopMoving() {
-	motor[motor1] = 0;
-	motor[motor4] = 0;
-	motor[motor2] = 0;
-	motor[motor3] = 0;
-}
-
 void findTape() {
 	startingValue = SensorValue[LIGHT];
 	motor[motor1] = -30;
@@ -103,15 +63,14 @@ void driveAlongTape() {
 
 			motor[motor2] = 30;
 			motor[motor3] = 30;
-		} else {
-			motor[motor1] = 0;
-			motor[motor2] = 0;
-			motor[motor3] = 0;
-			motor[motor4] = 0;
+	} else {
+		motor[motor1] = 0;
+		motor[motor2] = 0;
+		motor[motor3] = 0;
+		motor[motor4] = 0;
 
-			wait1Msec(2000);
-			alignToTape();
-		}
+		wait1Msec(2000);
+		alignToTape();
 	}
 }
 
@@ -125,7 +84,6 @@ MAIN
 */
 task main()
 {
-	faceTape(); //Face the tape so we can look for it
 	findTape(); //Look for the tape!
 	alignToTape(); //Align to the found tape.
 	driveAlongTape(); //Drive along the tape.
