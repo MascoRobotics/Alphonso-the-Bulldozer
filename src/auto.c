@@ -1,5 +1,6 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  none,     none)
 #pragma config(Sensor, S2,     LIGHT,          sensorLightActive)
+#pragma config(Sensor, S3,     LIGHT2,         sensorLightActive)
 #pragma config(Motor,  mtr_S1_C1_1,     motor1,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     motor2,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     motor3,        tmotorTetrix, openLoop)
@@ -14,6 +15,7 @@ INCLUDES
 /*
 VARS
 */
+const int threshold = 3;
 int startingValue = 0;
 int v = 0;
 int tapeValue = 0;
@@ -24,7 +26,7 @@ FUNCTION DECLARATION
 */
 bool doISeeTape();
 void findTape();
-bool amIonTape();
+bool amIonTape(bool both);
 void driveAlongTape();
 void alignToTape();
 void moveFoward();
@@ -88,22 +90,47 @@ void findTape() {
 
 bool doISeeTape() {
 	v = SensorValue[LIGHT];
-	return abs(v - startingValue) >= 3; //If the new value has changed by 15 compared to the starting value
+	return abs(v - startingValue) >= threshold; //If the new value has changed by 3 compared to the starting value
 }
 
 void alignToTape() {
-	//TODO We need a second light sensor
+	while (true) {
+		int backsense = SensorValue[LIGHT2];
+		int frontsense = SensorValue[LIGHT];
+		bool moved = false;
+
+		while (abs(tapeValue - backsense) >= threshold + 2) {
+			motor[motor1] = 50;
+			motor[motor2] = 50;
+			motor[motor3] = 0;
+			motor[motor4] = 0;
+			backsense = SensorValue[LIGHT2];
+			moved = true;
+		}
+
+		while (abs(tapeValue - frontsense) >= threshold + 2) {
+			motor[motor1] = 0;
+			motor[motor2] = 0;
+			motor[motor3] = 50;
+			motor[motor4] = 50;
+			frontsense = SensorValue[LIGHT];
+			moved = true;
+		}
+
+		if (!moved)
+			break;
+	}
 }
 
 void driveAlongTape() {
 	while (true) {
-		if (amIonTape()) {
+		if (amIonTape(true)) {
 			motor[motor1] = -30;
 			motor[motor4] = -30;
 
 			motor[motor2] = 30;
 			motor[motor3] = 30;
-		} else {
+		} else if (amIonTape(false)) {
 			motor[motor1] = 0;
 			motor[motor2] = 0;
 			motor[motor3] = 0;
@@ -111,13 +138,19 @@ void driveAlongTape() {
 
 			wait1Msec(2000);
 			alignToTape();
+		} else { //Were not on tape anymore..
+			break;
 		}
 	}
 }
 
-bool amIonTape() {
+bool amIonTape(bool both) {
 	v = SensorValue[LIGHT];
-	return abs(v - tapeValue) <= 4;
+	int v2 = SensorValue[LIGHT2];
+	if (both)
+		return abs(v - tapeValue) <= threshold + 1 && abs(v2 - tapeValue) <= threshold + 1;
+	else
+		return abs(v - tapeValue) <= threshold + 1 || abs(v2 - tapeValue) <= threshold + 1;
 }
 
 /*
