@@ -39,6 +39,8 @@ FUNCTIONS
 */
 void faceTape() {
 	moveFoward();
+
+
 	wait1Msec(500);
 	moveRotate(1);
 	nMotorEncoder[motor4] = 0;
