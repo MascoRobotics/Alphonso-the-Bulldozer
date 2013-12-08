@@ -41,26 +41,12 @@ void stopMoving() {
 
 task main()
 {
-  waitForStart();
-	moveFoward();
-	wait1Msec(500);
+	waitForStart();
+	moveForard();
+	wait1Msec(1500);
 	moveRotate(1);
-	nMotorEncoder[frontRight] = 0;
-
-	while (encoderValue < 599) {
-		encoderValue = nMotorEncoder[frontRight];
-	}
-
+	wait1Msec(500);
 	moveFoward();
 	wait1Msec(1000);
-	moveRotate(-1);
-	nMotorEncoder[frontRight] = 0;
-	encoderValue = 0;
-
-	while (encoderValue < 2200) {
-		encoderValue = abs(nMotorEncoder[frontRight]);
-	}
-
-	moveFast();
-	wait1Msec(2500);
+	stopMoving();
 }
