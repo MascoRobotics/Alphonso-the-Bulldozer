@@ -18,6 +18,13 @@ void moveFoward() {
 	motor[frontLeft] = 50;
 }
 
+void moveFast() {
+	motor[backRight] = -100;
+	motor[frontRight] = -100;
+	motor[backLeft] = 100;
+	motor[frontLeft] = 100;
+}
+
 void moveRotate(int value) {
 	motor[backRight] = 50 * value;
 	motor[frontRight] = 50 * value;
@@ -45,15 +52,15 @@ task main()
 	}
 
 	moveFoward();
-	wait1Msec(1500);
+	wait1Msec(1000);
 	moveRotate(-1);
 	nMotorEncoder[frontRight] = 0;
 	encoderValue = 0;
 
-	while (encoderValue < 3300) {
+	while (encoderValue < 2200) {
 		encoderValue = abs(nMotorEncoder[frontRight]);
 	}
 
-	moveFoward();
-	wait1Msec(3000);
+	moveFast();
+	wait1Msec(2500);
 }

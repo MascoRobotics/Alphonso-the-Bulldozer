@@ -18,11 +18,26 @@ void moveFoward() {
 	motor[frontLeft] = 50;
 }
 
+<<<<<<< HEAD
+void moveFast() {
+	motor[backRight] = -100;
+	motor[frontRight] = -100;
+	motor[backLeft] = 100;
+	motor[frontLeft] = 100;
+}
+
+void moveRotate(int value) {
+	motor[backRight] = 50 * value;
+	motor[frontRight] = 50 * value;
+	motor[backLeft] = 50 * value;
+	motor[frontLeft] = 50 * value;
+=======
 void moveRotate(int value) {
 	motor[backRight] = -50 * value;
 	motor[frontRight] = -50 * value;
 	motor[backLeft] = -50 * value;
 	motor[frontLeft] = -50 * value;
+>>>>>>> 40980a24792a420bcfa280320d60c46268cfc742
 }
 
 void stopMoving() {
@@ -34,8 +49,18 @@ void stopMoving() {
 
 task main()
 {
+<<<<<<< HEAD
+	waitForStart();
+	moveForard();
+	wait1Msec(1500);
+	moveRotate(1);
+	wait1Msec(500);
+	moveFoward();
+	wait1Msec(1000);
+=======
   //waitForStart();
 	moveFoward();
 	wait1Msec(2500);
+>>>>>>> 40980a24792a420bcfa280320d60c46268cfc742
 	stopMoving();
 }
