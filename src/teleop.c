@@ -87,8 +87,13 @@ task main()
 			pressed_d = false;
 		}
 
-
-
+		if (joy2Btn(4) == 1 || joy2Btn(5) == 1) {
+			if (joy2Btn(4) == 1)
+				PlaySound(soundBeepBeep);
+			else
+				PlaySound(soundFastUpwardTones);
+		} else
+			ClearSounds();
 
 
 
