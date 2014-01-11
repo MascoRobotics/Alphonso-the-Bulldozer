@@ -1,11 +1,15 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTServo,  HTMotor)
+#pragma config(Hubs,  S3, HTMotor,  none,     none,     none)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
+#pragma config(Sensor, S3,     ,               sensorI2CMuxController)
 #pragma config(Motor,  mtr_S1_C1_1,     motor1,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     motor2,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     motor3,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     motor4,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C4_1,     flag,          tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C4_2,     motorI,        tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S3_C1_1,     spinner1,      tmotorTetrix, openLoop, encoder)
+#pragma config(Motor,  mtr_S3_C1_2,     spinner2,      tmotorTetrix, openLoop, encoder)
 #pragma config(Servo,  srvo_S1_C3_1,    servo1,               tServoStandard)
 #pragma config(Servo,  srvo_S1_C3_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S1_C3_3,    servo3,               tServoNone)
@@ -19,16 +23,23 @@
 /**
 VARS
 **/
-float speed = 1;
+const int DEADZONE = 10;
+double speed = 1;
 bool pressed_d = false;
 bool lift = false;
 bool button6pressed = false;
+bool button5pressed = false;
+bool spinning = false;
+
+int resetPos1, resetPos2;
+int temp1, temp2;
 
 
 void initializeRobot()
 {
-	playSoundFile("sound.rso");
 	waitForStart();
+	resetPos1 = nMotorEncoder[spinner1];
+	resetPos2 = nMotorEncoder[spinner2];
 	return;
 }
 
@@ -59,10 +70,52 @@ void collectBlock() {
 	closeLift();
 }
 
+void resetSpinner1() {
+	temp2 = nMotorEncoder[spinner1];
+	while (abs(temp2 - resetPos1) > 50) {
+		motor[spinner1] = resetPos1 - temp2;
+		temp2 = nMotorEncoder[spinner1];
+	}
+	motor[spinner1] = 0;
+}
 
-void addSpeed(int add)
+void resetSpinner2() {
+	temp1 = nMotorEncoder[spinner2];
+	while (abs(temp1 - resetPos2) > 50) {
+		motor[spinner2] = resetPos2 - temp1;
+		temp1 = nMotorEncoder[spinner2];
+	}
+	motor[spinner2] = 0;
+}
+
+void spinBackwards() {
+	if (ServoValue[servo6] <= 5 || ServoValue[servo1] >= 250) return;
+	motor[spinner1] = 100;
+	motor[spinner2] = -100;
+
+}
+
+void spinSpinners() {
+	/*
+	servo[servo1]=0; // bulldozer lifts up
+			servo[servo6]=255;
+	*/
+
+	if (ServoValue[servo6] <= 5 || ServoValue[servo1] >= 250) return;
+	motor[spinner1] = -100;
+	motor[spinner2] = 100;
+
+}
+
+void stopSpinningSpinners() {
+	motor[spinner1] = 0;
+	motor[spinner2] = 0;
+}
+
+
+void addSpeed(double add)
 {
-	speed += add;
+	speed /= add;
 }
 
 task main()
@@ -72,6 +125,10 @@ task main()
 		getJoystickSettings(joystick);
 	  int yval = joystick.joy1_y1;
 		int xval = joystick.joy1_x1;
+		if (abs(xval) < DEADZONE)
+			xval = 0;
+		if (abs(yval) < DEADZONE)
+			yval = 0;
 
 		move(xval, yval);
 
@@ -79,9 +136,9 @@ task main()
 	  		if (joystick.joy1_TopHat == 0 || joystick.joy1_TopHat == 4) {
 				pressed_d = true;
 				if (joystick.joy1_TopHat == 0)
-					addSpeed(0.5);
+					addSpeed(2);
 				else
-					addSpeed(-0.5);
+					addSpeed(-2);
 			}
 		} else if (pressed_d && joystick.joy1_TopHat == -1) {
 			pressed_d = false;
@@ -95,7 +152,40 @@ task main()
 		} else
 			ClearSounds();
 
-
+		if (ServoValue[servo6] > 30 && ServoValue[servo1] < 200) {
+			if(joy2Btn(5)==1 || joy2Btn(7))
+			{
+				if (joy2Btn(7)
+					motor[spinner1] = 100 / speed;
+				else
+					motor[spinner1] = -100 / speed;
+			}
+			else {
+				motor[spinner1]=0;
+			}
+			if (joy2Btn(6) == 1 || joy2Btn(8) == 1) {
+				if (joy2Btn(6))
+					motor[spinner2] = 100 / speed;
+				else
+					motor[spinner2] = -100 / speed;
+			} else {
+				motor[spinner2] = 0;
+			}
+		}
+		/*if ((joy1Btn(5) == 1 || joy1Btn(7) == 1) && !button5pressed) {
+			spinning = !spinning;
+			if (spinning) {
+				if (joy1Btn(5))
+					spinSpinners();
+				else
+					spinBackwards();
+			}
+			else
+				stopSpinningSpinners();
+			button5pressed = true;
+		} else if (joy1Btn(5) == 0 || joy1Btn(7)) {
+			button5pressed = false;
+		}*/
 
 		if(joy1Btn(6)==1 && !button6pressed) // if button 6 is pressed
 		{
@@ -113,22 +203,21 @@ task main()
 		}
 		else									// if not pressed bulldozer is down
 		{
-			servo[servo1]=255;
-			servo[servo6]=0;
+			int liftPos = abs(joystick.joy1_y2);
+			servo[servo1]=255-liftPos;
+			servo[servo6]=liftPos;
+			if (ServoValue[servo6] <= 30 || ServoValue[servo1] >= 200) stopSpinningSpinners();
 		}
-
-
-
 
 
 		if (joy1Btn(2)) {
 			collectBlock();
 		}
-		else if(joy1Btn(1)==1) // if button 1 is pressed
+		else if(joy2Btn(1)==1) // if button 1 is pressed
 		{
 		  motor[flag]=100; // flag raiser motor will activate
 		}
-		else if (joy1Btn(3))									// if not pressed
+		else if (joy2Btn(3))									// if not pressed
 		{
 			motor[flag]=-100;   // flag motor will not activate
 		} else {
