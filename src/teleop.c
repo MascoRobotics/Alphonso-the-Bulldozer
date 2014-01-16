@@ -155,7 +155,7 @@ task main()
 		if (ServoValue[servo6] > 30 && ServoValue[servo1] < 200) {
 			if(joy2Btn(5)==1 || joy2Btn(7))
 			{
-				if (joy2Btn(5)
+				if (joy2Btn(7))
 					motor[spinner1] = 100 / speed;
 				else
 					motor[spinner1] = -100 / speed;

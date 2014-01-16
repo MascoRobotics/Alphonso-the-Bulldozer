@@ -83,8 +83,8 @@ task main() {
 	// forward
 	RmoveForward(100,50);
 
-	// turn left 270 deg
-	RmoveRotate(-50,3);
+	// turn left 90 deg
+	RmoveRotate(-50,1);
 
 	// move forward onto ramp
 	RmoveForward(100,10);
