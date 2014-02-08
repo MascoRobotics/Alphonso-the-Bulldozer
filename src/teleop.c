@@ -2,8 +2,8 @@
 #pragma config(Hubs,  S3, HTMotor,  none,     none,     none)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S3,     ,               sensorI2CMuxController)
-#pragma config(Motor,  mtr_S1_C1_1,     motor1,        tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C1_2,     motor2,        tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_1,     spider1,        tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_2,     spider2,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     motor3,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     motor4,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C4_1,     flag,          tmotorTetrix, openLoop)
@@ -44,11 +44,7 @@ void initializeRobot()
 }
 
 void move(int xval, int yval) {
-
-		motor[motor1] = (-yval - xval) / speed;
 		motor[motor4] = (-yval - xval) / speed;
-
-		motor[motor2] = (yval - xval) / speed;
 		motor[motor3] = (yval - xval) / speed;
 }
 
@@ -152,6 +148,11 @@ task main()
 		} else
 			ClearSounds();
 
+		if (joy1Btn(7) == 1 || joy1Btn(8) == 1) {
+			if (joy1Btn(7) == 1) motor[spider1] = 100;
+			else if (joy1Btn(8) == 1) motor[spider1] = -100;
+		} else motor[spider1] = 0;
+
 		if (ServoValue[servo6] > 30 && ServoValue[servo1] < 200) {
 			if(joy2Btn(5)==1 || joy2Btn(7))
 			{
@@ -172,20 +173,6 @@ task main()
 				motor[spinner2] = 0;
 			}
 		}
-		/*if ((joy1Btn(5) == 1 || joy1Btn(7) == 1) && !button5pressed) {
-			spinning = !spinning;
-			if (spinning) {
-				if (joy1Btn(5))
-					spinSpinners();
-				else
-					spinBackwards();
-			}
-			else
-				stopSpinningSpinners();
-			button5pressed = true;
-		} else if (joy1Btn(5) == 0 || joy1Btn(7)) {
-			button5pressed = false;
-		}*/
 
 		if(joy1Btn(6)==1 && !button6pressed) // if button 6 is pressed
 		{

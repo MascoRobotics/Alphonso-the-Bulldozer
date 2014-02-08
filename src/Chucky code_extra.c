@@ -1,14 +1,15 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTServo,  HTMotor)
 #pragma config(Hubs,  S3, HTMotor,  none,     none,     none)
 #pragma config(Sensor, S2,     IR,             sensorHiTechnicIRSeeker1200)
-#pragma config(Motor,  mtr_S1_C1_1,     backRight,     tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C1_2,     backLeft,      tmotorTetrix, openLoop)
+#pragma config(Motor,  motorA,          hand,           tmotorNXT, PIDControl, encoder)
+#pragma config(Motor,  mtr_S1_C1_1,     spider1,       tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_2,     spider2,       tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     frontLeft,     tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     frontRight,    tmotorTetrix, openLoop, encoder)
 #pragma config(Motor,  mtr_S1_C4_1,     motorH,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C4_2,     chucky,        tmotorTetrix, openLoop, encoder)
-#pragma config(Motor,  mtr_S3_C1_1,      ,             tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S3_C1_2,      ,             tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S3_C1_1,     spinner1,      tmotorTetrix, openLoop, encoder)
+#pragma config(Motor,  mtr_S3_C1_2,     spinner2,      tmotorTetrix, openLoop, encoder)
 #pragma config(Servo,  srvo_S1_C3_1,    servo1,               tServoStandard)
 #pragma config(Servo,  srvo_S1_C3_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S1_C3_3,    servo3,               tServoNone)
@@ -22,14 +23,27 @@ int encoder = 0;
 int value = 0;
 
 /**
+Open the hand to drop the block
+*/
+void openHand() {
+	motor[hand] = 100;
+	wait1Msec(1000);
+	motor[hand] = -100;
+	wait1Msec(100);
+	motor[hand] = 0;
+}
+
+/**
 Slame the arm down and give the basket a smack
 */
 void releaseArm() {
 	motor[chucky] = -60;
 	nMotorEncoder[chucky]=0;
-	while(value > -190) {
+	while(value > -360) {
 		value = nMotorEncoder[chucky];
 	}
+	motor[chucky] = 0;
+	openHand();
 }
 
 /**
@@ -37,9 +51,10 @@ Raise the arm up and make it hit itself
 */
 void raiseArm() {
 	motor[chucky] = 60;
-	while(value < -50) {
+	while(value < -290) {
 		value = nMotorEncoder[chucky];
 	}
+	motor[chucky] = 0;
 }
 
 /**
@@ -47,9 +62,7 @@ Drive foward
 The speed provided in the parameter will be the amount of power given to the motor
 */
 void moveForward(int speed) {
-	motor[backRight] = -speed;
 	motor[frontRight] = -speed;
-	motor[backLeft] = speed;
 	motor[frontLeft] = speed;
 }
 
@@ -58,9 +71,7 @@ FULL SPEED AHEAD!
 Move foward with full power
 */
 void moveFast() {
-	motor[backRight] = -100;
 	motor[frontRight] = -100;
-	motor[backLeft] = 100;
 	motor[frontLeft] = 100;
 }
 
@@ -69,9 +80,7 @@ Rotate the robot. The value provided in the parameter will be multiplied by 50, 
 power given to the motor
 */
 void moveRotate(int value) {
-	motor[backRight] = 50 * value;
 	motor[frontRight] = 50 * value;
-	motor[backLeft] = 50 * value;
 	motor[frontLeft] = 50 * value;
 }
 
@@ -79,9 +88,7 @@ void moveRotate(int value) {
 Stop moving..
 */
 void stopMoving() {
-	motor[backRight] = 0;
 	motor[frontRight] = 0;
-	motor[backLeft] = 0;
 	motor[frontLeft] = 0;
 }
 
@@ -141,11 +148,16 @@ void initRobot() {
 /**
 === MAIN TASK ===
 */
+int irvalue = 0;
+const int RAMP = -10450;
 task main()
 {
 	initRobot(); //DO NOT REMOVE
 
-	nMotorEncoder[frontRight] = 0;
+	releaseArm();
+	wait1Msec(500);
+	raiseArm();
+	/*nMotorEncoder[frontRight] = 0;
 	moveForward(30);
 	while (irvalue != 5) {
 		irvalue = SensorValue[IR];
@@ -182,5 +194,5 @@ task main()
 	stopMoving();
 
 	moveForward(-50);
-	wait1Msec(2000);
+	wait1Msec(2000);*/
 }
