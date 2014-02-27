@@ -1,15 +1,11 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTServo,  HTMotor)
-#pragma config(Hubs,  S3, HTMotor,  none,     none,     none)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S3,     ,               sensorI2CMuxController)
-#pragma config(Motor,  mtr_S1_C1_1,     spider1,        tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C1_2,     spider2,        tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_1,     spinner1,      tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_2,     spinner2,      tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     motor3,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     motor4,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C4_1,     flag,          tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C4_2,     motorI,        tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S3_C1_1,     spinner1,      tmotorTetrix, openLoop, encoder)
-#pragma config(Motor,  mtr_S3_C1_2,     spinner2,      tmotorTetrix, openLoop, encoder)
 #pragma config(Servo,  srvo_S1_C3_1,    servo1,               tServoStandard)
 #pragma config(Servo,  srvo_S1_C3_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S1_C3_3,    servo3,               tServoNone)
@@ -148,10 +144,10 @@ task main()
 		} else
 			ClearSounds();
 
-		if (joy1Btn(7) == 1 || joy1Btn(8) == 1) {
+		/*if (joy1Btn(7) == 1 || joy1Btn(8) == 1) {
 			if (joy1Btn(7) == 1) motor[spider1] = 100;
 			else if (joy1Btn(8) == 1) motor[spider1] = -100;
-		} else motor[spider1] = 0;
+		} else motor[spider1] = 0;*/
 
 		if (ServoValue[servo6] > 30 && ServoValue[servo1] < 200) {
 			if(joy2Btn(5)==1 || joy2Btn(7))

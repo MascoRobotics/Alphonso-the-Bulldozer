@@ -118,9 +118,7 @@ void delayOption() {
 
 void askWaitForStart() {
 	while (true) {
-		if (nNxtButtonPressed == 3)
-			break;
-		else if (nNxtButtonPressed == 1) {
+		if (nNxtButtonPressed == 1) {
 			waitForS = false;
 			break;
 		} else if (nNxtButtonPressed == 2) {
@@ -128,7 +126,7 @@ void askWaitForStart() {
 			break;
 		}
 		eraseDisplay();
-		nxtDisplayCenteredBigTextLine(3, "(Y)  Wait?  (N)");
+		nxtDisplayCenteredTextLine(5, "(Y) Wait? (N)");
 		wait1Msec(1);
 	}
 }
@@ -154,10 +152,8 @@ task main()
 {
 	initRobot(); //DO NOT REMOVE
 
-	releaseArm();
-	wait1Msec(500);
-	raiseArm();
-	/*nMotorEncoder[frontRight] = 0;
+
+	nMotorEncoder[frontRight] = 0;
 	moveForward(30);
 	while (irvalue != 5) {
 		irvalue = SensorValue[IR];
@@ -194,5 +190,5 @@ task main()
 	stopMoving();
 
 	moveForward(-50);
-	wait1Msec(2000);*/
+	wait1Msec(2000);
 }
